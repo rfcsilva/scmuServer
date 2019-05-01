@@ -25,7 +25,7 @@ public class ComputationResource {
 	/**
 	 * A logger object.
 	 */
-	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+	private static final Logger LOG = Logger.getLogger(UsersResource.class.getName());
 	private final Gson g = new Gson();
 	private static final DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
 	

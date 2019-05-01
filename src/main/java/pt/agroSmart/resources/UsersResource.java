@@ -1,6 +1,5 @@
 package pt.agroSmart.resources;
 
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -26,8 +25,12 @@ import com.google.appengine.api.datastore.*;
 import pt.agroSmart.resources.User.AuthToken;
 import pt.agroSmart.resources.User.LoginData;
 import pt.agroSmart.resources.User.User;
+import pt.agroSmart.util.InformationChecker;
 import pt.agroSmart.util.PasswordEncriptor;
 import pt.agroSmart.util.Strings;
+
+import static pt.agroSmart.util.InformationChecker.validEmail;
+import static pt.agroSmart.util.InformationChecker.validPassword;
 
 
 /**
@@ -36,17 +39,77 @@ import pt.agroSmart.util.Strings;
  * @author Ruben Silva
  *
  */
-@Path("/login")
+@Path("/users")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-public class LoginResource {
+public class UsersResource {
 
 	/**
 	 * A logger object.
 	 */
-	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+	private static final Logger LOG = Logger.getLogger(UsersResource.class.getName());
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-	public LoginResource() { } //Nothing to be done here...
+	public UsersResource() { } //Nothing to be done here...
+
+
+	@POST
+	@Path("/register")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	public Response registerUserV3(User data) {
+		LOG.fine("Attempt to register user: " + data.userName);
+
+		if( !InformationChecker.validRegistration(data.userName, data.password, data.confirmationPassword,  data.email, data.role) ) {
+
+			return Response.status(Status.BAD_REQUEST).entity(Strings.FAILED_REQUIERED_PARAMS).build();
+		}
+
+		Transaction txn = datastore.beginTransaction(TransactionOptions.Builder.withXG(true));
+		User user;
+		Key key = User.generateKey(data.userName);
+		Entity specializedRole;
+		Date creationDate = new Date();
+
+		try {
+			// If the entity does not exist an Exception is thrown. Otherwise,
+			datastore.get(key);
+			txn.rollback();
+			return Response.status(Status.BAD_REQUEST).entity(Strings.ALREADY_EXISTS).build();
+
+		} catch (EntityNotFoundException e) {
+
+			if(!validPassword(data.password, data.confirmationPassword  )){
+				LOG.info("ERROR: The password is not valid.");
+				txn.rollback();
+				return Response.status(Status.UNAUTHORIZED).entity("New pass is not valid").build();
+			}
+
+
+			if(data.email!=null) {
+				if(!validEmail(data.email)) {
+					LOG.warning("ERROR: INVALID EMAIL");
+					txn.rollback();
+					return Response.status(Status.BAD_REQUEST).entity(Strings.FAILED_REQUIERED_PARAMS).build();
+				}
+			}
+
+
+			user = new User(data.userName, data.password, data.confirmationPassword, data.name, data.email, data.phoneNumber, data.role, data.company );
+			if (user.ds_save(txn))
+				return Response.status(Status.OK).build();
+
+			txn.rollback();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+
+		} finally {
+			if (txn.isActive() ) {
+				txn.rollback();
+			}
+		}
+	}
+
+
+
 
 	/**
 	 * To Login you have to  use HTTP POST request and send a JSON object with your username and password.
@@ -56,7 +119,7 @@ public class LoginResource {
 	 * @return Authentication token - HTTP Header "Authorization".
 	 */
 	@POST
-	@Path("/")
+	@Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response doLoginV2(LoginData data,
 							  @Context HttpServletRequest request,

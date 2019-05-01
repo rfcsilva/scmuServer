@@ -7,18 +7,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="35babc8b-1841-452a-a898-bcc9ed0c1105" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/User/LoginData.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/User/LoginLog.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/ScmuServer_war_exploded.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/ScmuServer_war_exploded.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ScmuServer.iml" beforeDir="false" afterPath="$PROJECT_DIR$/ScmuServer.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/agroSmart/StorableObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/agroSmart/StorableObject.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/LoginResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/LoginResource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/User/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/User/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/agroSmart/util/AuthToken.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/User/AuthToken.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/agroSmart/util/PasswordEncriptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/agroSmart/util/PasswordEncriptor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/agroSmart/util/Strings.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/agroSmart/util/Strings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/ComputationResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/ComputationResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/LoginResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/UsersResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/RegisterResource.java" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -36,10 +28,10 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/LoginResource.java">
+        <entry file="file://$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/UsersResource.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="911">
-              <caret line="68" selection-start-line="68" selection-end-line="68" />
+            <state relative-caret-position="454">
+              <caret line="73" column="64" selection-start-line="73" selection-start-column="64" selection-end-line="73" selection-end-column="64" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -90,7 +82,6 @@
         <option value="$PROJECT_DIR$/src/main/java/pt/agroSmart/DSObject.java" />
         <option value="$PROJECT_DIR$/src/main/java/pt/agroSmart/util/RegisterData.java" />
         <option value="$PROJECT_DIR$/src/main/java/pt/agroSmart/util/InformationChecker.java" />
-        <option value="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/RegisterResource.java" />
         <option value="$PROJECT_DIR$/src/main/java/pt/agroSmart/util/LoginData.java" />
         <option value="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/User/User.java" />
         <option value="$PROJECT_DIR$/src/main/java/pt/agroSmart/StorableObject.java" />
@@ -100,6 +91,8 @@
         <option value="$PROJECT_DIR$/src/main/java/pt/agroSmart/util/AuthToken.java" />
         <option value="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/User/LoginLog.java" />
         <option value="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/LoginResource.java" />
+        <option value="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/RegisterResource.java" />
+        <option value="$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/UsersResource.java" />
       </list>
     </option>
   </component>
@@ -329,12 +322,12 @@
       <workItem from="1556730974244" duration="4547000" />
       <workItem from="1556743264925" duration="815000" />
       <workItem from="1556744744507" duration="154000" />
-      <workItem from="1556744919558" duration="5702000" />
+      <workItem from="1556744919558" duration="5957000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="13840000" />
+    <option name="totallyTimeSpent" value="14095000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="25" width="1853" height="1055" extended-state="6" />
@@ -461,16 +454,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/RegisterResource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1155">
-          <caret line="77" column="73" selection-start-line="77" selection-start-column="73" selection-end-line="77" selection-end-column="73" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/ComputationResource.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
@@ -560,10 +543,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/LoginResource.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/RegisterResource.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="911">
-          <caret line="68" selection-start-line="68" selection-end-line="68" />
+        <state relative-caret-position="450">
+          <caret line="30" selection-start-line="30" selection-end-line="30" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/pt/agroSmart/resources/UsersResource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="454">
+          <caret line="73" column="64" selection-start-line="73" selection-start-column="64" selection-end-line="73" selection-end-column="64" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
