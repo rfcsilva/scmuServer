@@ -36,7 +36,6 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
-import pt.agroSmart.util.LoginData;
 import pt.agroSmart.util.AuthToken;
 
 @Path("/login")

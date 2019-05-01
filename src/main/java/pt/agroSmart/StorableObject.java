@@ -29,14 +29,8 @@ public abstract class StorableObject {
      */
     private static int MAXIMUM_ATTEMPTS = 5;
 
-
     private final String DataType;
-
-    private Key key;
-
-    public StorableObject(String dataType) {
-        this.DataType = dataType;
-    }
+    private final Key key;
 
     public StorableObject(String dataType, Key key) {
         this.key = key;
