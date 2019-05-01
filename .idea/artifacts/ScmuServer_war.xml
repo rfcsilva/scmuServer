@@ -1,14 +1,14 @@
 <component name="ArtifactManager">
-  <artifact type="war" name="firstwebapp:war">
+  <artifact type="war" name="ScmuServer:war">
     <output-path>$PROJECT_DIR$/target</output-path>
     <properties id="maven-jee-properties">
       <options>
-        <module>firstwebapp</module>
+        <module>ScmuServer</module>
         <packaging>war</packaging>
       </options>
     </properties>
     <root id="archive" name="firstwebapp-0.1.0-SNAPSHOT.war">
-      <element id="artifact" artifact-name="firstwebapp:war exploded" />
+      <element id="artifact" artifact-name="ScmuServer:war exploded" />
     </root>
   </artifact>
 </component>
