@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/firstwebapp.iml" filepath="$PROJECT_DIR$/firstwebapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ScmuServer.iml" filepath="$PROJECT_DIR$/ScmuServer.iml" />
     </modules>
   </component>
 </project>

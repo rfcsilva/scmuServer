@@ -1,4 +1,4 @@
-package pt.unl.fct.di.apdc.firstwebapp.filters;
+package pt.agroSmart.filters;
 
 import java.io.IOException;
 

@@ -7,7 +7,7 @@
 		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>jersey.config.server.provider.classnames</param-name>
-			<param-value>pt.unl.fct.di.apdc.firstwebapp.filters.AdditionalResponseHeadersFilter</param-value>
+			<param-value>pt.agroSmart.filters.AdditionalResponseHeadersFilter</param-value>
 		</init-param>
 		<init-param>
 			<param-name>jersey.config.servlet.filter.contextPath</param-name>
@@ -15,7 +15,7 @@
 		</init-param>
 		<init-param>
 			<param-name>jersey.config.server.provider.packages</param-name>
-			<param-value>pt.unl.fct.di.apdc.firstwebapp.resources</param-value>
+			<param-value>pt.agroSmart.resources</param-value>
 		</init-param>
 		<init-param>
 			<param-name>jersey.config.server.provider.scanning.recursive</param-name>
@@ -34,7 +34,7 @@
 
 	<servlet>
 		<servlet-name>storage-servlet</servlet-name>
-		<servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.GcsExampleServlet</servlet-class>
+		<servlet-class>pt.agroSmart.resources.GcsExampleServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>

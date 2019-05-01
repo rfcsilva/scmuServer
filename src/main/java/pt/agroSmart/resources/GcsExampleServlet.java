@@ -1,4 +1,4 @@
-package pt.unl.fct.di.apdc.firstwebapp.resources;
+package pt.agroSmart.resources;
 
 //[END gcs_imports]
 import java.io.IOException;

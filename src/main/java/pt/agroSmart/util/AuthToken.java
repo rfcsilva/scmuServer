@@ -1,4 +1,4 @@
-package pt.unl.fct.di.apdc.firstwebapp.util;
+package pt.agroSmart.util;
 
 import java.util.UUID;
 
