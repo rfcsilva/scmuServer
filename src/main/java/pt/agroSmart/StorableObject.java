@@ -29,14 +29,17 @@ public abstract class StorableObject {
      */
     private static int MAXIMUM_ATTEMPTS = 5;
 
-    private final String DataType;
-    private final Key key;
+    public String DataType;
+    public Key key;
 
     public StorableObject(String dataType, Key key) {
         this.key = key;
         this.DataType = dataType;
         Entity e = this.ds_get();
         this.fromEntity(e);
+    }
+
+    public StorableObject() {
     }
 
     abstract protected Entity encodeEntity();

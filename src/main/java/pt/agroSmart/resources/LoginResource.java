@@ -1,17 +1,13 @@
 package pt.agroSmart.resources;
 
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -19,25 +15,27 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.appengine.api.datastore.FetchOptions;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.PropertyProjection;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Transaction;
-import com.google.appengine.api.datastore.Query.Filter;
-import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.api.datastore.Query.FilterPredicate;
-import com.google.appengine.api.datastore.Query.SortDirection;
-import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUtils;
-import com.google.gson.Gson;
 
-import pt.agroSmart.util.AuthToken;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
 
+import com.google.appengine.api.datastore.*;
+
+import pt.agroSmart.resources.User.AuthToken;
+import pt.agroSmart.resources.User.LoginData;
+import pt.agroSmart.resources.User.User;
+import pt.agroSmart.util.PasswordEncriptor;
+import pt.agroSmart.util.Strings;
+
+
+/**
+ *This Resource is responsible for logging users to out app.
+ *
+ * @author Ruben Silva
+ *
+ */
 @Path("/login")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class LoginResource {
@@ -46,176 +44,138 @@ public class LoginResource {
 	 * A logger object.
 	 */
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
-	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-	
+
 	public LoginResource() { } //Nothing to be done here...
-	
+
+	/**
+	 * To Login you have to  use HTTP POST request and send a JSON object with your username and password.
+	 * @param data JSON obj with username and password.
+	 * @param request - HTTP request.
+	 * @param headers - HTTP Request headers
+	 * @return Authentication token - HTTP Header "Authorization".
+	 */
 	@POST
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response doLogin(LoginData data) {
-		LOG.fine("Attempt to login user: " + data.username);
-		
-		if(data.username.equals("jleitao") && data.password.equals("password")) {
-			AuthToken token = new AuthToken(data.username);
-			LOG.info("User '" + data.username + "' logged in sucessfully.");
-			return Response.ok(g.toJson(token)).build();
-		} 
-		LOG.warning("Failed login attempt for username: " + data.username);
-		return Response.status(Status.FORBIDDEN).entity(g.toJson("Incorrect username or password.")).build();
-	}
-	
-	@GET
-	@Path("/{username}")
-	public Response checkUsernameAvailable(@PathParam("username") String username) {
-		if(!username.equals("jleitao")) {
-			return Response.ok().entity(g.toJson(false)).build();
-		} else {
-			return Response.ok().entity(g.toJson(true)).build();
-		}
-	}
-	
-	@POST
-	@Path("/v1")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response doLoginV1(LoginData data) {
-		LOG.fine("Attempt to login user: " + data.username);
-		
-		Key userKey = KeyFactory.createKey("User",data.username);
-		try {
-			Entity user = datastore.get(userKey);
-			String hashedPWD = (String) user.getProperty("user_pwd");
-			if( hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
-				LOG.info("User '" + data.username + "' logged in sucessfully.");
-				AuthToken token = new AuthToken(data.username);
-				return Response.ok(g.toJson(token)).build();
-			} else {
-				LOG.warning("Wrong password for: " + data.username);
-				return Response.status(Status.FORBIDDEN).build();
-			}
-		} catch( EntityNotFoundException e) {
-			LOG.warning("Failed login attempt for username: " + data.username);
-			return Response.status(Status.FORBIDDEN).build();
-		}	
-	}
-	
-	@POST
-	@Path("/v2")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public Response doLoginV2(LoginData data, 
-			                  @Context HttpServletRequest request,
-			                  @Context HttpHeaders headers) {
-		LOG.info("Attempt to login user: " + data.username);
+	public Response doLoginV2(LoginData data,
+							  @Context HttpServletRequest request,
+							  @Context HttpHeaders headers) {
 
-		Transaction txn = datastore.beginTransaction();
-		Key userKey = KeyFactory.createKey("User", data.username);
+		LOG.info(Strings.ABOUT_TO_LOGIN + data.username);
+
+		Transaction txn = datastore.beginTransaction(TransactionOptions.Builder.withXG(true));
+		Key userKey = User.generateKey(data.username);
 		try {
 			Entity user = datastore.get(userKey);
-			
+
 			// Obtain the user login statistics
-			Query ctrQuery = new Query("UserStats").setAncestor(userKey);
+			Query ctrQuery = new Query(Strings.USER_STATS_KIND).setAncestor(userKey);
 			List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
 			Entity ustats = null;
 			if (results.isEmpty()) {
-				ustats = new Entity("UserStats", user.getKey() );
-				ustats.setProperty("user_stats_logins", 0L);
-				ustats.setProperty("user_stats_failed", 0L);
+				ustats = new Entity(Strings.USER_STATS_KIND, user.getKey() );
+				ustats.setProperty(Strings.USER_STATS_LOGIN, 0L);
+				ustats.setProperty(Strings.USER_STATS_FAILED, 0L);
 			} else {
 				ustats = results.get(0);
 			}
 
-			String hashedPWD = (String) user.getProperty("user_pwd");
-			if (hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
+			String hashedPWD = (String) user.getProperty(Strings.PASSWORD);
+			if (hashedPWD.equals(PasswordEncriptor.get_sha256_HMAC_SecurePassword(data.password))) {
+
 				// Password correct
-				
+				LOG.info(Strings.PASSWORD_CORRECT);
 				// Construct the logs
-				Entity log = new Entity("UserLog", user.getKey());
-				log.setProperty("user_login_ip", request.getRemoteAddr());
-				log.setProperty("user_login_host", request.getRemoteHost());
-				log.setProperty("user_login_latlon", headers.getHeaderString("X-AppEngine-CityLatLong"));
-				log.setProperty("user_login_city", headers.getHeaderString("X-AppEngine-City"));
-				log.setProperty("user_login_country", headers.getHeaderString("X-AppEngine-Country"));
-				log.setProperty("user_login_time", new Date());
+				Entity log = new Entity(Strings.USER_LOG, user.getKey());
+				log.setProperty(Strings.USER_IP, request.getRemoteAddr());
+				log.setProperty(Strings.USER_HOST, request.getRemoteHost());
+				log.setProperty(Strings.USER_LATLON, headers.getHeaderString("X-AppEngine-CityLatLong"));
+				log.setProperty(Strings.LOGIN_LOGIN_CITY, headers.getHeaderString("X-AppEngine-City"));
+				log.setProperty(Strings.USER_LOGIN_COUNTRY, headers.getHeaderString("X-AppEngine-Country"));
+				log.setProperty(Strings.LOGIN_DATE, new Date());
 				// Get the user statistics and updates it
-				ustats.setProperty("user_stats_logins", 1L + (long) ustats.getProperty("user_stats_logins"));
-				ustats.setProperty("user_stats_failed", 0L );
-				ustats.setProperty("user_stats_last", new Date());		
-				
-				// Batch operation
-				List<Entity> logs = Arrays.asList(log,ustats);
-				datastore.put(txn,logs);
+				ustats.setProperty(Strings.USER_STATS_LOGIN, 1L + (long) ustats.getProperty("user_stats_logins"));
+				ustats.setProperty(Strings.USER_STATS_FAILED, 0L );
+				ustats.setProperty(Strings.USER_STATS_LASTLOGIN, new Date());
+
+				List<Entity> toStore = Arrays.asList(log,ustats);
+
+				Algorithm algorithm = Algorithm.HMAC256(Strings.SECRET);
+
+				Entity token_entity ;
+				String token;
+				try {
+
+					JWTVerifier verifier = JWT.require(algorithm)
+							.withIssuer("agroSmart")
+							.build();
+
+					Query query = new Query(AuthToken.TYPE);
+					query.setAncestor(userKey);
+					token_entity = datastore.prepare(query).asSingleEntity();
+					token = (String) token_entity.getProperty(Strings.TOKEN);
+					verifier.verify(token);
+					//TODO ver por id
+				}catch(Exception e  ) {
+
+					//Creating the token
+					Date expiration = new Date(System.currentTimeMillis() + Strings.EXPIRATION_TIME);
+					String token_id = UUID.randomUUID().toString();
+					token = JWT.create()
+							.withExpiresAt(expiration)
+							.withIssuer("maisverde")
+							.withClaim(Strings.USERNAME, data.username)
+							.withIssuedAt(new Date())
+							.withJWTId(token_id)
+							.sign(algorithm)
+					;
+
+					token_entity = new Entity(AuthToken.TYPE, token_id, userKey );
+					token_entity.setUnindexedProperty(Strings.TOKEN_ID, token_id);
+					token_entity.setProperty(Strings.USERNAME, data.username);
+					token_entity.setUnindexedProperty(Strings.TOKEN, token);
+					token_entity.setProperty(Strings.EXPIRATION_TIME_MSG, expiration);
+
+					toStore = Arrays.asList(log,ustats,token_entity);
+				}
+
+				datastore.put(txn,toStore);
+
+				LOG.info("User " + data.username + "' logged in sucessfully.");
 				txn.commit();
-				
-				// Return token
-				AuthToken token = new AuthToken(data.username);
-				LOG.info("User '" + data.username + "' logged in sucessfully.");
-				return Response.ok(g.toJson(token)).build();				
+				return Response.ok().header(HttpHeaders.AUTHORIZATION, "Bearer " + token).build();
 			} else {
 				// Incorrect password
-				ustats.setProperty("user_stats_failed", 1L + (long) ustats.getProperty("user_stats_failed"));
-				datastore.put(txn,ustats);				
+				ustats.setProperty(Strings.USER_STATS_FAILED, 1L + (long) ustats.getProperty(Strings.USER_STATS_FAILED));
+				datastore.put(txn,ustats);
 				txn.commit();
 
-				LOG.warning("Wrong password for username: " + data.username);
-				return Response.status(Status.FORBIDDEN).build();				
+				LOG.warning(Strings.WRONG_PASSWORD + data.username);
+				return Response.status(Status.FORBIDDEN).entity(Strings.WRONG_PASSWORD).build();
 			}
+
+
 		} catch (EntityNotFoundException e) {
 			// Username does not exist
+			txn.rollback();
 			LOG.warning("Failed login attempt for username: " + data.username);
-			return Response.status(Status.FORBIDDEN).build();
+			return Response.status(Status.NOT_FOUND).build();
+
+		} catch (JWTCreationException exception){
+			//Invalid Signing configuration / Couldn't convert Claims.
+			txn.rollback();
+			return Response.status(Status.BAD_REQUEST).build();
+		}catch(Exception e) {
+			e.printStackTrace();
+			txn.rollback();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		} finally {
 			if (txn.isActive()) {
 				txn.rollback();
-				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
 		}
-		
-	}
-	
-	@POST
-	@Path("/user")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public Response checkUsernameAvailable(LoginData data ) {
-		
-		Key userKey = KeyFactory.createKey("User", data.username);
-		try {
-			Entity user = datastore.get(userKey);
-			String hashedPWD = (String) user.getProperty("user_pwd");
-			if (hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
 
-				Calendar cal = Calendar.getInstance();
-				cal.add(Calendar.DATE, -1);
-				Date yesterday = cal.getTime();
-				
-				// Obtain the user login statistics
-				Filter propertyFilter =
-					    new FilterPredicate("user_login_time", FilterOperator.GREATER_THAN_OR_EQUAL, yesterday);
-				Query ctrQuery = new Query("UserLog").setAncestor(KeyFactory.createKey("User", data.username))
-						             .setFilter(propertyFilter)
-						             .addSort("user_login_time", SortDirection.DESCENDING);
-				ctrQuery.addProjection(new PropertyProjection("user_login_time", Date.class));
-				ctrQuery.addProjection(new PropertyProjection("user_login_ip", String.class));
-				List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withLimit(3));
-				
-/*				List<Date> loginDates = new ArrayList();
-				for(Entity userlog:results) {
-						loginDates.add((Date) userlog.getProperty("user_login_time"));
-				}
-*/				return Response.ok(g.toJson(results)).build();
-			
-			} else {
-				LOG.warning("Wrong password for username: " + data.username );
-				return Response.status(Status.FORBIDDEN).build();				
-			}
-		} catch (EntityNotFoundException e) {
-			// Username does not exist
-			LOG.warning("Failed login attempt for username: " + data.username);
-			return Response.status(Status.FORBIDDEN).build();
-		}
 	}
-
 
 }

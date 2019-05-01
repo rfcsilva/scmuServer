@@ -8,9 +8,9 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
-class PasswordEncriptor {
+public class PasswordEncriptor {
 
-    static String get_sha256_HMAC_SecurePassword(String passwordToHash){
+    public static String get_sha256_HMAC_SecurePassword(String passwordToHash){
 
         String generatedPassword;
         generatedPassword = null;

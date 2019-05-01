@@ -57,7 +57,7 @@ public class Strings {
     public static final String EXPIRATION_TIME_MSG = "expiration_time";
 
     //token
-    public static final String TOKEN_KIND = "token";
+
     public static final long EXPIRATION_TIME = DAY_IN_MS*2; //2 days
     public static final String AUTHENTICATION = "AUTHENTICATION";
 

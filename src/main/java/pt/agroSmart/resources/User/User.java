@@ -26,6 +26,8 @@ public class User extends StorableObject {
     public String role;
     public String company;
 
+    public User(){ super(); }
+
     public User(String userName, String password, String confirmationPassword, String name, String email, int phoneNumber, String role, String company){
         super(TYPE, generateKey(userName)) ;
         this.userName = userName;
