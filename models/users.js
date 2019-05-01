@@ -1,8 +1,6 @@
 const express = require('express');
 const crypto = require('crypto');
-const {
-	Datastore
-} = require('@google-cloud/datastore');
+const Datastore = require('@google-cloud/datastore');
 
 const DataType = 'User';
 
