@@ -35,8 +35,6 @@ public abstract class StorableObject {
     public StorableObject(String dataType, Key key) {
         this.key = key;
         this.DataType = dataType;
-        Entity e = this.ds_get();
-        this.fromEntity(e);
     }
 
     public StorableObject() {
@@ -96,6 +94,7 @@ public abstract class StorableObject {
         try {
             Entity entity = this.encodeEntity();
             DS.put(tx, entity);
+            LOG.fine("Added user");
             return true;
         } catch (Exception e) {
             LOG.severe("Failed to store " + this.DataType + ". Key: " + this.key.toString());

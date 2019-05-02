@@ -57,18 +57,15 @@ public class UsersResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public Response registerUserV3(User data) {
-		LOG.fine("Attempt to register user: " + data.userName);
-
-		if( !InformationChecker.validRegistration(data.userName, data.password, data.confirmationPassword,  data.email, data.role) ) {
+		LOG.fine("Attempt to register user: " + data.username);
+		if( !InformationChecker.validRegistration(data.username, data.password, data.confirmation_password,  data.email, data.role) ) {
 
 			return Response.status(Status.BAD_REQUEST).entity(Strings.FAILED_REQUIERED_PARAMS).build();
 		}
 
 		Transaction txn = datastore.beginTransaction(TransactionOptions.Builder.withXG(true));
 		User user;
-		Key key = User.generateKey(data.userName);
-		Entity specializedRole;
-		Date creationDate = new Date();
+		Key key = User.generateKey(data.username);
 
 		try {
 			// If the entity does not exist an Exception is thrown. Otherwise,
@@ -78,7 +75,7 @@ public class UsersResource {
 
 		} catch (EntityNotFoundException e) {
 
-			if(!validPassword(data.password, data.confirmationPassword  )){
+			if(!validPassword(data.password, data.confirmation_password)){
 				LOG.info("ERROR: The password is not valid.");
 				txn.rollback();
 				return Response.status(Status.UNAUTHORIZED).entity("New pass is not valid").build();
@@ -93,10 +90,12 @@ public class UsersResource {
 				}
 			}
 
+			user = new User(data.username, PasswordEncriptor.get_sha256_HMAC_SecurePassword(data.password), PasswordEncriptor.get_sha256_HMAC_SecurePassword(data.confirmation_password), data.name, data.email, data.phoneNumber, data.role, data.company );
 
-			user = new User(data.userName, data.password, data.confirmationPassword, data.name, data.email, data.phoneNumber, data.role, data.company );
-			if (user.ds_save(txn))
+			if (user.ds_save(txn)) {
+				txn.commit();
 				return Response.status(Status.OK).build();
+			}
 
 			txn.rollback();
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
@@ -135,7 +134,7 @@ public class UsersResource {
 			// Obtain the user login statistics
 			Query ctrQuery = new Query(Strings.USER_STATS_KIND).setAncestor(userKey);
 			List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
-			Entity ustats = null;
+			Entity ustats ;
 			if (results.isEmpty()) {
 				ustats = new Entity(Strings.USER_STATS_KIND, user.getKey() );
 				ustats.setProperty(Strings.USER_STATS_LOGIN, 0L);
@@ -144,7 +143,8 @@ public class UsersResource {
 				ustats = results.get(0);
 			}
 
-			String hashedPWD = (String) user.getProperty(Strings.PASSWORD);
+			String hashedPWD = (String) user.getProperty(User.PASSWORD);
+			System.out.println(hashedPWD == null);
 			if (hashedPWD.equals(PasswordEncriptor.get_sha256_HMAC_SecurePassword(data.password))) {
 
 				// Password correct
