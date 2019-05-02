@@ -39,9 +39,9 @@ public class UserStats  extends StorableObject {
     public static Key generateKey(String user){
         return KeyFactory.createKey(TYPE, user);
     }
-    public void incrementLogins(){ user_stats_logins+=1; }
+    public void incrementLogins(){ user_stats_logins+=1L; }
 
-    public void incrementFails(){ user_stats_failed+=1; }
+    public void incrementFails(){ user_stats_failed+=1L; }
 
     public void setLastLogin(long date){ user_last_login = date; }
 

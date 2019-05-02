@@ -20,6 +20,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.google.appengine.api.datastore.*;
 
 import pt.agroSmart.resources.User.*;
@@ -154,41 +155,22 @@ public class UsersResource {
 				ustats.incrementLogins();
 				ustats.setLastLogin(loginDate);
 
-				Algorithm algorithm = Algorithm.HMAC256(Strings.SECRET);
-
 				Entity token_entity;
 				String token;
 				try {
-
-					JWTVerifier verifier = JWT.require(algorithm)
-							.withIssuer("agroSmart")
-							.build();
 
 					Query query = new Query(AuthToken.TYPE);
 					query.setAncestor(userKey);
 					token_entity = datastore.prepare(query).asSingleEntity();
 					token = (String) token_entity.getProperty(Strings.TOKEN);
-					verifier.verify(token);
-					//TODO ver por id
-				}catch(Exception e  ) {
+					AuthToken.verifier.verify(token);
+
+				}catch(JWTVerificationException e  ) {
 
 					//Creating the token
-					Date expiration = new Date(System.currentTimeMillis() + Strings.EXPIRATION_TIME);
-					String token_id = UUID.randomUUID().toString();
-					token = JWT.create()
-							.withExpiresAt(expiration)
-							.withIssuer("maisverde")
-							.withClaim(Strings.USERNAME, data.username)
-							.withIssuedAt(new Date())
-							.withJWTId(token_id)
-							.sign(algorithm)
-					;
-
-					token_entity = new Entity(AuthToken.TYPE, token_id, userKey );
-					token_entity.setUnindexedProperty(Strings.TOKEN_ID, token_id);
-					token_entity.setProperty(Strings.USERNAME, data.username);
-					token_entity.setUnindexedProperty(Strings.TOKEN, token);
-					token_entity.setProperty(Strings.EXPIRATION_TIME_MSG, expiration);
+                    AuthToken authToken = new AuthToken(data.username, userKey);
+                    token = authToken.issueToken();
+                    authToken.ds_save(txn);
 
 				}
 
@@ -200,15 +182,15 @@ public class UsersResource {
 				txn.commit();
 				return Response.ok().header(HttpHeaders.AUTHORIZATION, "Bearer " + token).build();
 			} else {
+
 				// Incorrect password
-				ustats.setProperty(Strings.USER_STATS_FAILED, 1L + (long) ustats.getProperty(Strings.USER_STATS_FAILED));
-				datastore.put(txn,ustats);
+				ustats.incrementFails();
+				ustats.ds_save(txn);
 				txn.commit();
 
 				LOG.warning(Strings.WRONG_PASSWORD + data.username);
 				return Response.status(Status.FORBIDDEN).entity(Strings.WRONG_PASSWORD).build();
 			}
-
 
 		} catch (EntityNotFoundException e) {
 			// Username does not exist

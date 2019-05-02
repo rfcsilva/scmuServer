@@ -54,7 +54,7 @@ public class Strings {
     public static final long INITIAL = 0L;
     public static final double INITIAL_FLOAT = 0.0;
     public static final String SOLVED_CASES = "solved_cases";
-    public static final String EXPIRATION_TIME_MSG = "expiration_time";
+
 
     //token
 
@@ -95,7 +95,7 @@ public class Strings {
 
 
     //Login Resource Constants
-    public static final String SECRET = "1449F2B6E6710251CC37506AF4C84A11F09DB25DB52CAFC4529D7F476552E90A";
+
     public static final String WRONG_PASSWORD = "Wrong password for username: ";
 
     public static final String MARKER_COMMENTS_KIND = "marker_comments_kind";
@@ -219,7 +219,6 @@ public class Strings {
     public static final String MEETUP_POINT = "meetup_point";
 
 
-    public static final String TOKEN_ID = "token_id";
 
 
     public static final String REGISTER_CODE = "register_code";
