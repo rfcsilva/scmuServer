@@ -3,11 +3,8 @@ package pt.agroSmart;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.api.datastore.*;
+import pt.agroSmart.resources.User.User;
 
 public abstract class StorableObject {
 
@@ -100,14 +97,9 @@ public abstract class StorableObject {
         }
     }
 
-    public Entity ds_get() {
-        try {
-            return DS.get(key);
-        } catch (Exception e) {
-            LOG.warning("Attempt to get non existent " + this.DataType + ". Key: " + key);
-            return null;
-        }
+    public Entity ds_get() throws EntityNotFoundException {
 
+            return DS.get(key);
     }
 
     public List<StorableObject> list(){

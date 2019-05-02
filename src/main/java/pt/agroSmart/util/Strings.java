@@ -10,7 +10,7 @@ public class Strings {
     public static final String DELETE_EMAILS_MESSAGE = "O GAE vai eliminar os tokens expirados";
 
     //OK messages
-    public static final String USER_REGISTED = "User registered ";
+
 
 
     //Register Errors
@@ -21,7 +21,6 @@ public class Strings {
     public static final String FAILED_CC = "ERROR: User CC number has not been correctly inserted.";
     public static final String FAILED_NIF = "ERROR: User NIF has not been correctly inserted.";
     public static final String FAILED_POSTALCODE = "ERROR. User address has not been correctly inserted.";
-    public static final String ALREADY_EXISTS = "ERROR: User already exists.";
 
 
     //user_ops_errors

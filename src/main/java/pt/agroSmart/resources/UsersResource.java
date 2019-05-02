@@ -1,35 +1,24 @@
 package pt.agroSmart.resources;
 
-import java.util.*;
-import java.util.logging.Logger;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
-
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
-
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.google.appengine.api.datastore.*;
-
 import pt.agroSmart.resources.User.*;
 import pt.agroSmart.util.InformationChecker;
 import pt.agroSmart.util.PasswordEncriptor;
 import pt.agroSmart.util.Strings;
 
-import static pt.agroSmart.util.InformationChecker.validEmail;
-import static pt.agroSmart.util.InformationChecker.validPassword;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import java.util.List;
+import java.util.logging.Logger;
+
+import static pt.agroSmart.util.Strings.USER_NOT_FOUND;
 
 
 /**
@@ -47,6 +36,15 @@ public class UsersResource {
 	 */
 	private static final Logger LOG = Logger.getLogger(UsersResource.class.getName());
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+	private static final String ATTEMPT_TO_REGISTER_USER = "Attempt to register user: ";
+	private static final String ALREADY_EXISTS = "ERROR: User already exists.";
+	private static final String USER_REGISTED = "User registered ";
+	private static final String INVALID_PARAMS = "Register data is not valid.";
+	private static final String USER_ALREADY_EXISTS_ERROR = "User already exists. Aborting register.";
+	private static final String RETRIEVING_USER_INFO = "Retrieving user info.";
+	private static final String SENDINGDATA = "Sending request response.";
+	private static final String REQUEST_TO_UPDATE_USER_INFO = "Request to update user info.";
+	private static final String USER_INFO_UPDATED = "User Info Updated";
 
 	public UsersResource() { } //Nothing to be done here...
 
@@ -56,38 +54,26 @@ public class UsersResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public Response registerUserV3(User data) {
-		LOG.fine("Attempt to register user: " + data.username);
-		if( !InformationChecker.validRegistration(data.username, data.password, data.confirmation_password,  data.email, data.role) ) {
 
+		LOG.info(ATTEMPT_TO_REGISTER_USER + data.username);
+
+		if( !InformationChecker.validRegistration(data.username, data.password, data.confirmation_password,  data.email, data.phoneNumber, data.role) ) {
+
+			LOG.warning(INVALID_PARAMS);
 			return Response.status(Status.BAD_REQUEST).entity(Strings.FAILED_REQUIERED_PARAMS).build();
 		}
 
 		Transaction txn = datastore.beginTransaction(TransactionOptions.Builder.withXG(true));
-		User user;
-		Key key = User.generateKey(data.username);
+		User user = new User(data.username);
 
 		try {
 			// If the entity does not exist an Exception is thrown. Otherwise,
-			datastore.get(key);
+			user.ds_get();
 			txn.rollback();
-			return Response.status(Status.BAD_REQUEST).entity(Strings.ALREADY_EXISTS).build();
+			LOG.warning(USER_ALREADY_EXISTS_ERROR);
+			return Response.status(Status.BAD_REQUEST).entity(ALREADY_EXISTS).build();
 
 		} catch (EntityNotFoundException e) {
-
-			if(!validPassword(data.password, data.confirmation_password)){
-				LOG.info("ERROR: The password is not valid.");
-				txn.rollback();
-				return Response.status(Status.UNAUTHORIZED).entity("New pass is not valid").build();
-			}
-
-
-			if(data.email!=null) {
-				if(!validEmail(data.email)) {
-					LOG.warning("ERROR: INVALID EMAIL");
-					txn.rollback();
-					return Response.status(Status.BAD_REQUEST).entity(Strings.FAILED_REQUIERED_PARAMS).build();
-				}
-			}
 
 			user = new User(data.username, PasswordEncriptor.get_sha256_HMAC_SecurePassword(data.password), PasswordEncriptor.get_sha256_HMAC_SecurePassword(data.confirmation_password), data.name, data.email, data.phoneNumber, data.role, data.company );
 
@@ -95,6 +81,8 @@ public class UsersResource {
 				txn.commit();
 				return Response.status(Status.OK).build();
 			}
+
+			LOG.fine(USER_REGISTED);
 
 			txn.rollback();
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
@@ -126,12 +114,15 @@ public class UsersResource {
 		LOG.info(Strings.ABOUT_TO_LOGIN + data.username);
 
 		Transaction txn = datastore.beginTransaction(TransactionOptions.Builder.withXG(true));
-		Key userKey = User.generateKey(data.username);
+		User user = new User(data.username);
+
 		try {
-			Entity user = datastore.get(userKey);
+
+			Entity userEntity = user.ds_get();
+			user = User.fromEntity(userEntity);
 
 			// Obtain the user login statistics
-			Query ctrQuery = new Query(UserStats.TYPE).setAncestor(userKey);
+			Query ctrQuery = new Query(UserStats.TYPE).setAncestor(userEntity.getKey());
 			List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
 			UserStats ustats ;
 			if (results.isEmpty()) {
@@ -140,7 +131,7 @@ public class UsersResource {
 				ustats = UserStats.fromEntity(results.get(0));
 			}
 
-			String hashedPWD = (String) user.getProperty(User.PASSWORD);
+			String hashedPWD = user.getPassword();
 			if (hashedPWD.equals(PasswordEncriptor.get_sha256_HMAC_SecurePassword(data.password))) {
 
 				// Password correct
@@ -160,7 +151,7 @@ public class UsersResource {
 				try {
 
 					Query query = new Query(AuthToken.TYPE);
-					query.setAncestor(userKey);
+					query.setAncestor(userEntity.getKey());
 					token_entity = datastore.prepare(query).asSingleEntity();
 					token = (String) token_entity.getProperty(Strings.TOKEN);
 					AuthToken.verifier.verify(token);
@@ -168,7 +159,7 @@ public class UsersResource {
 				}catch(JWTVerificationException e  ) {
 
 					//Creating the token
-                    AuthToken authToken = new AuthToken(data.username, userKey);
+                    AuthToken authToken = new AuthToken(data.username, userEntity.getKey());
                     token = authToken.issueToken();
                     authToken.ds_save(txn);
 
@@ -210,6 +201,52 @@ public class UsersResource {
 			if (txn.isActive()) {
 				txn.rollback();
 			}
+		}
+
+	}
+
+	@GET
+	@Path("/{user}")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	public Response getUserPersonalInfo(@PathParam("user") String username){
+
+		LOG.info(RETRIEVING_USER_INFO);
+
+		User user = new User(username);
+		try {
+			Entity userEntity = user.ds_get();
+			LOG.fine(SENDINGDATA);
+			return Response.ok().entity(User.fromEntity(userEntity)).build();
+		} catch (EntityNotFoundException e) {
+			LOG.warning(USER_NOT_FOUND);
+			return Response.status(Status.NOT_FOUND).build();
+		}
+	}
+
+	@PUT
+	@Path("/{user}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateUser(@PathParam("user") String username,  User data){
+
+		LOG.info(REQUEST_TO_UPDATE_USER_INFO);
+
+		User user = new User(username);
+		Entity userEntity;
+		try {
+
+			userEntity = user.ds_get();
+			user = User.fromEntity(userEntity);
+			user.updateInfo(data);
+			user.ds_save();
+
+			LOG.fine(USER_INFO_UPDATED);
+
+			return Response.ok().build();
+
+		} catch (EntityNotFoundException e) {
+
+			LOG.warning(USER_NOT_FOUND);
+			return Response.status(Status.NOT_FOUND).build();
 		}
 
 	}
