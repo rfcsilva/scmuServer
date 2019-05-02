@@ -22,9 +22,7 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 
 import com.google.appengine.api.datastore.*;
 
-import pt.agroSmart.resources.User.AuthToken;
-import pt.agroSmart.resources.User.LoginData;
-import pt.agroSmart.resources.User.User;
+import pt.agroSmart.resources.User.*;
 import pt.agroSmart.util.InformationChecker;
 import pt.agroSmart.util.PasswordEncriptor;
 import pt.agroSmart.util.Strings;
@@ -132,41 +130,33 @@ public class UsersResource {
 			Entity user = datastore.get(userKey);
 
 			// Obtain the user login statistics
-			Query ctrQuery = new Query(Strings.USER_STATS_KIND).setAncestor(userKey);
+			Query ctrQuery = new Query(UserStats.TYPE).setAncestor(userKey);
 			List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
-			Entity ustats ;
+			UserStats ustats ;
 			if (results.isEmpty()) {
-				ustats = new Entity(Strings.USER_STATS_KIND, user.getKey() );
-				ustats.setProperty(Strings.USER_STATS_LOGIN, 0L);
-				ustats.setProperty(Strings.USER_STATS_FAILED, 0L);
+				ustats = new UserStats( data.username );
 			} else {
-				ustats = results.get(0);
+				ustats = UserStats.fromEntity(results.get(0));
 			}
 
 			String hashedPWD = (String) user.getProperty(User.PASSWORD);
-			System.out.println(hashedPWD == null);
 			if (hashedPWD.equals(PasswordEncriptor.get_sha256_HMAC_SecurePassword(data.password))) {
 
 				// Password correct
-				LOG.info(Strings.PASSWORD_CORRECT);
-				// Construct the logs
-				Entity log = new Entity(Strings.USER_LOG, user.getKey());
-				log.setProperty(Strings.USER_IP, request.getRemoteAddr());
-				log.setProperty(Strings.USER_HOST, request.getRemoteHost());
-				log.setProperty(Strings.USER_LATLON, headers.getHeaderString("X-AppEngine-CityLatLong"));
-				log.setProperty(Strings.LOGIN_LOGIN_CITY, headers.getHeaderString("X-AppEngine-City"));
-				log.setProperty(Strings.USER_LOGIN_COUNTRY, headers.getHeaderString("X-AppEngine-Country"));
-				log.setProperty(Strings.LOGIN_DATE, new Date());
-				// Get the user statistics and updates it
-				ustats.setProperty(Strings.USER_STATS_LOGIN, 1L + (long) ustats.getProperty("user_stats_logins"));
-				ustats.setProperty(Strings.USER_STATS_FAILED, 0L );
-				ustats.setProperty(Strings.USER_STATS_LASTLOGIN, new Date());
+				LOG.info(LoginLog.PASSWORD_CORRECT);
 
-				List<Entity> toStore = Arrays.asList(log,ustats);
+				// Construct the logs
+				long loginDate = System.currentTimeMillis();
+				LoginLog log = new LoginLog(request.getRemoteAddr(), request.getRemoteHost(), headers.getHeaderString("X-AppEngine-CityLatLong"),
+						headers.getHeaderString("X-AppEngine-City"),  headers.getHeaderString("X-AppEngine-Country"), loginDate);
+
+				// Get the user statistics and updates it
+				ustats.incrementLogins();
+				ustats.setLastLogin(loginDate);
 
 				Algorithm algorithm = Algorithm.HMAC256(Strings.SECRET);
 
-				Entity token_entity ;
+				Entity token_entity;
 				String token;
 				try {
 
@@ -200,10 +190,11 @@ public class UsersResource {
 					token_entity.setUnindexedProperty(Strings.TOKEN, token);
 					token_entity.setProperty(Strings.EXPIRATION_TIME_MSG, expiration);
 
-					toStore = Arrays.asList(log,ustats,token_entity);
 				}
 
-				datastore.put(txn,toStore);
+				log.ds_save(txn);
+				ustats.ds_save(txn);
+
 
 				LOG.info("User " + data.username + "' logged in sucessfully.");
 				txn.commit();

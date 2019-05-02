@@ -67,10 +67,10 @@ public class User extends StorableObject {
 
     }
 
-    @Override
-    protected void fromEntity(Entity e) {
 
-        new User(
+    protected static StorableObject fromEntity(Entity e) {
+
+        return new User(
                 (String) e.getProperty(USERNAME),
                 (String) e.getProperty(PASSWORD),
                 (String) e.getProperty(NAME),

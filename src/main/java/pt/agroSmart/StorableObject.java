@@ -42,9 +42,6 @@ public abstract class StorableObject {
 
     abstract protected Entity encodeEntity();
 
-    abstract protected void fromEntity(Entity e);
-
-
     public boolean ds_delete() {
         for( int i = 0; i < StorableObject.MAXIMUM_ATTEMPTS; i++) {
             Transaction tx = null;

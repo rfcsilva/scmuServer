@@ -95,19 +95,6 @@ public class Strings {
 
 
     //Login Resource Constants
-    public static final String USER_STATS_KIND = "UserStats";
-    public static final String USER_STATS_LOGIN = "user_stats_logins";
-    public static final String USER_STATS_FAILED = "user_stats_failed";
-    public static final String PASSWORD_CORRECT = "Password is correct";
-    public static final String USER_LOG = "UserLog";
-    public static final String USER_IP = "user_login_ip";
-    public static final String USER_HOST = "user_login_host";
-    public static final String USER_LATLON = "user_login_latlon";
-    public static final String LOGIN_LOGIN_CITY = "user_login_city";
-    public static final String USER_LOGIN_COUNTRY = "user_login_country";
-    public static final String LOGIN_DATE = "user_login_time";
-    public static final String USER_NUMB_LOGINS = "user_stats_logins";
-    public static final String USER_STATS_LASTLOGIN = "user_stats_last";
     public static final String SECRET = "1449F2B6E6710251CC37506AF4C84A11F09DB25DB52CAFC4529D7F476552E90A";
     public static final String WRONG_PASSWORD = "Wrong password for username: ";
 
