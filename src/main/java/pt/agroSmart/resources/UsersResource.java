@@ -16,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import static pt.agroSmart.util.Strings.USER_NOT_FOUND;
@@ -38,11 +39,11 @@ public class UsersResource {
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private static final String ATTEMPT_TO_REGISTER_USER = "Attempt to register user: ";
 	private static final String ALREADY_EXISTS = "ERROR: User already exists.";
-	private static final String USER_REGISTED = "User registered ";
+	private static final String USER_RESISTED = "User registered ";
 	private static final String INVALID_PARAMS = "Register data is not valid.";
 	private static final String USER_ALREADY_EXISTS_ERROR = "User already exists. Aborting register.";
 	private static final String RETRIEVING_USER_INFO = "Retrieving user info.";
-	private static final String SENDINGDATA = "Sending request response.";
+	private static final String SENDING_DATA = "Sending request response.";
 	private static final String REQUEST_TO_UPDATE_USER_INFO = "Request to update user info.";
 	private static final String USER_INFO_UPDATED = "User Info Updated";
 
@@ -82,7 +83,7 @@ public class UsersResource {
 				return Response.status(Status.OK).build();
 			}
 
-			LOG.fine(USER_REGISTED);
+			LOG.fine(USER_RESISTED);
 
 			txn.rollback();
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
@@ -159,7 +160,7 @@ public class UsersResource {
 				}catch(JWTVerificationException e  ) {
 
 					//Creating the token
-                    AuthToken authToken = new AuthToken(data.username, userEntity.getKey());
+                    AuthToken authToken = new AuthToken(UUID.randomUUID().toString(), data.username, userEntity.getKey());
                     token = authToken.issueToken();
                     authToken.ds_save(txn);
 
@@ -215,7 +216,7 @@ public class UsersResource {
 		User user = new User(username);
 		try {
 			Entity userEntity = user.ds_get();
-			LOG.fine(SENDINGDATA);
+			LOG.fine(SENDING_DATA);
 			return Response.ok().entity(User.fromEntity(userEntity)).build();
 		} catch (EntityNotFoundException e) {
 			LOG.warning(USER_NOT_FOUND);

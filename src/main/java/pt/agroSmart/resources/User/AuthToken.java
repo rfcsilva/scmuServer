@@ -5,10 +5,11 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import pt.agroSmart.StorableObject;
 
 import java.util.Date;
-import java.util.UUID;
+
 
 public class AuthToken extends StorableObject {
 
@@ -26,24 +27,27 @@ public class AuthToken extends StorableObject {
     public static final JWTVerifier verifier = JWT.require(AuthToken.algorithm).withIssuer(AuthToken.ISSUER).build();
 
     private String username;
-    private Key userKey;
     private String id;
 	private Date creationDate;
 	private Date expirationDate;
     private String token;
 
-	public AuthToken(String username, Key userKey) {
-		this.username = username;
-		this.userKey = userKey;
-		this.id = UUID.randomUUID().toString();
+	public AuthToken(String id,String username, Key userKey) {
+		super(TYPE, generateKey(id, userKey));
+	    this.username = username;
+		this.id = id;
 		this.creationDate = new Date(System.currentTimeMillis());
 		this.expirationDate = new Date( this.creationDate.getTime() + AuthToken.EXPIRATION_TIME);
 	}
 
-	@Override
+    private static Key generateKey(String id, Key userKey) {
+	    return KeyFactory.createKey(userKey, TYPE, id);
+	}
+
+    @Override
 	protected Entity encodeEntity() {
 
-        Entity token_entity = new Entity(AuthToken.TYPE, id, userKey );
+        Entity token_entity = new Entity(AuthToken.TYPE, id, User.generateKey(username) );
         token_entity.setUnindexedProperty(TOKEN_ID, id);
         token_entity.setProperty(USERNAME,username);
         token_entity.setUnindexedProperty(TYPE, token);

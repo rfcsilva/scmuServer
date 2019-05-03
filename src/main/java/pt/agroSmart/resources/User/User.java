@@ -6,13 +6,13 @@ import pt.agroSmart.StorableObject;
 
 public class User extends StorableObject {
 
-    public static final String USERNAME = "username";
-    public static final String PASSWORD = "password";
-    public static final String NAME = "name";
-    public static final String EMAIL = "email";
-    public static final String PHONE_NUMBER = "phone number";
-    public static final String ROLE = "role";
-    public static final String COMPANY = "company";
+    static final String USERNAME = "username";
+    private static final String PASSWORD = "password";
+    private static final String NAME = "name";
+    private static final String EMAIL = "email";
+    private static final String PHONE_NUMBER = "phone number";
+    private static final String ROLE = "role";
+    private static final String COMPANY = "company";
 
 
     private static final String TYPE = "User";
@@ -89,7 +89,7 @@ public class User extends StorableObject {
 
     }
 
-    private static Key generateKey(String userName) {
+    public static Key generateKey(String userName) {
         return KeyFactory.createKey(TYPE, userName);
     }
 

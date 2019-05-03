@@ -4,6 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+import com.google.appengine.api.datastore.GeoPt;
+import com.google.appengine.repackaged.com.google.type.LatLng;
 import org.apache.commons.validator.routines.EmailValidator;
 
 public class InformationChecker {
@@ -36,8 +38,7 @@ public class InformationChecker {
 
     }
 
-
-    public static boolean validPassword(String password, String confirmationPassword) {
+     private static boolean validPassword(String password, String confirmationPassword) {
 
         if(password == null || confirmationPassword == null)
             return false;
@@ -46,6 +47,11 @@ public class InformationChecker {
             return false;
 
         return PasswordEncriptor.get_sha256_HMAC_SecurePassword(password).contentEquals(PasswordEncriptor.get_sha256_HMAC_SecurePassword(confirmationPassword));
+
+    }
+
+    public static boolean validPosition(GeoPt coordinates){
+        return !(coordinates.getLatitude() > 90) && !(coordinates.getLatitude() < -90) && !(coordinates.getLongitude() > 180) && !(coordinates.getLongitude() < -180);
 
     }
 
