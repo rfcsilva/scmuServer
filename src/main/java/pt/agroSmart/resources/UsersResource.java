@@ -79,11 +79,10 @@ public class UsersResource {
 			user = new User(data.username, PasswordEncriptor.get_sha256_HMAC_SecurePassword(data.password), PasswordEncriptor.get_sha256_HMAC_SecurePassword(data.confirmation_password), data.name, data.email, data.phoneNumber, data.role, data.company );
 
 			if (user.ds_save(txn)) {
+				LOG.fine(USER_RESISTED);
 				txn.commit();
-				return Response.status(Status.OK).build();
+				return Response.ok().build();
 			}
-
-			LOG.fine(USER_RESISTED);
 
 			txn.rollback();
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
@@ -123,9 +122,8 @@ public class UsersResource {
 			user = User.fromEntity(userEntity);
 
 			// Obtain the user login statistics
-			Query ctrQuery = new Query(UserStats.TYPE).setAncestor(userEntity.getKey());
-			List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
-			UserStats ustats ;
+			List<Entity> results = UserStats.list(UserStats.TYPE, userEntity.getKey());
+			UserStats ustats;
 			if (results.isEmpty()) {
 				ustats = new UserStats( data.username );
 			} else {

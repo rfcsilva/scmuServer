@@ -88,7 +88,6 @@ public abstract class StorableObject {
         try {
             Entity entity = this.encodeEntity();
             DS.put(tx, entity);
-            LOG.fine("Added user");
             return true;
         } catch (Exception e) {
             LOG.severe("Failed to store " + this.DataType + ". Key: " + this.key.toString());
@@ -102,8 +101,24 @@ public abstract class StorableObject {
             return DS.get(key);
     }
 
-    public List<StorableObject> list(){
-        return null;
+    //TODO Maybe do with cursors out of scope for the project
+    private static List<Entity> listNoAncestor(String dataType){
+
+        Query query = new Query(dataType);
+        return DS.prepare(query).asList(FetchOptions.Builder.withDefaults());
     }
 
+    private static List<Entity> listWithAncestor(String dataType, Key ancestor){
+
+        Query query = new Query(dataType).setAncestor(ancestor);
+        return DS.prepare(query).asList(FetchOptions.Builder.withDefaults());
+
+    }
+
+    public static List<Entity> list(String dataType, Key ancestor){
+        if(ancestor == null)
+            return listNoAncestor(dataType);
+
+        return listWithAncestor(dataType, ancestor);
+    }
 }

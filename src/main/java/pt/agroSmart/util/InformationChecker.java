@@ -22,7 +22,7 @@ public class InformationChecker {
                 && nonEmptyField(role);
     }
 
-    public static boolean validEmail(String email) {
+    private static boolean validEmail(String email) {
 
         return  EmailValidator.getInstance().isValid(email);
 
