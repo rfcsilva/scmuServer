@@ -3,11 +3,14 @@ package pt.agroSmart.resources;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.google.appengine.api.datastore.*;
+import com.google.gson.Gson;
+import pt.agroSmart.StorableObject;
 import pt.agroSmart.resources.User.*;
 import pt.agroSmart.util.InformationChecker;
 import pt.agroSmart.util.PasswordEncriptor;
 import pt.agroSmart.util.Strings;
 
+import javax.annotation.Generated;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -15,6 +18,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -37,6 +41,8 @@ public class UsersResource {
 	 */
 	private static final Logger LOG = Logger.getLogger(UsersResource.class.getName());
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+	private static final Gson gson = new Gson();
+
 	private static final String ATTEMPT_TO_REGISTER_USER = "Attempt to register user: ";
 	private static final String ALREADY_EXISTS = "ERROR: User already exists.";
 	private static final String USER_RESISTED = "User registered ";
@@ -46,10 +52,16 @@ public class UsersResource {
 	private static final String SENDING_DATA = "Sending request response.";
 	private static final String REQUEST_TO_UPDATE_USER_INFO = "Request to update user info.";
 	private static final String USER_INFO_UPDATED = "User Info Updated";
+	public static final String LISTING_USERS = "Listing Users";
 
 	public UsersResource() { } //Nothing to be done here...
 
 
+	/**
+	 * This endpoint is used to register a new user to the application.
+	 * @param data (username, password, confirmation_password,  name, email, phone, role, company)
+	 * @return 200Ok if the user is resisted, 409 if the user already exists, 400 if the data is not valid.
+	 */
 	@POST
 	@Path("/register")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -218,12 +230,13 @@ public class UsersResource {
 		try {
 			Entity userEntity = user.ds_get();
 			LOG.fine(SENDING_DATA);
-			return Response.ok().entity(User.fromEntity(userEntity)).build();
+			return Response.ok().entity(gson.toJson(User.fromEntity(userEntity))).build();
 		} catch (EntityNotFoundException e) {
 			LOG.warning(USER_NOT_FOUND);
 			return Response.status(Status.NOT_FOUND).build();
 		}
 	}
+
 
 	@PUT
 	@Path("/{user}")
@@ -251,6 +264,21 @@ public class UsersResource {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 
+	}
+
+	@GET
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	public Response listUsers(){
+
+
+		LOG.info(LISTING_USERS);
+		List<Entity> entity_users = StorableObject.list(User.TYPE, null );
+		List<User> users = new ArrayList<>(entity_users.size());
+		for(Entity uEntity : entity_users)
+			users.add(User.fromEntity(uEntity));
+
+		return Response.ok(gson.toJson(users)).build();
 	}
 
 }

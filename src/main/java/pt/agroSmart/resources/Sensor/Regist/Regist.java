@@ -6,15 +6,16 @@ import pt.agroSmart.resources.GreenHouse.GreenHouse;
 
 public class Regist extends StorableObject {
 
-    public static final String AIR_HUMIDITY = "Air humidity";
     private static final String TYPE = "regist";
-    public static final String GRENN_HOUSE = "grennHouse";
-    public static final String TEMPERATURE = "Temperature";
-    public static final String SOIL_HUMIDITY = "Soil Humidity";
-    public static final String WATER_LEVEL = "Water Level";
-    public static final String LUMINOSITY = "Luminosity";
-    public static final String STEAM = "Steam";
-    public static final String TIME_STAMP = "TimeStamp";
+
+    private static final String AIR_HUMIDITY = "Air humidity";
+    private static final String GRENN_HOUSE = "grennHouse";
+    private static final String TEMPERATURE = "Temperature";
+    private static final String SOIL_HUMIDITY = "Soil Humidity";
+    private static final String WATER_LEVEL = "Water Level";
+    private static final String LUMINOSITY = "Luminosity";
+    private static final String STEAM = "Steam";
+    private static final String TIME_STAMP = "TimeStamp";
 
     public String greenHouseId;
     public float temperature;
@@ -25,7 +26,7 @@ public class Regist extends StorableObject {
     public double steam;
     public long timeStamp;
 
-    public Regist() { super(); }
+    public Regist() { } /* Needed for Jersey */
 
     public Regist(String greenHouseId, float temprature, float soilHumidity, float airHumidity, float waterLevel, double luminosity, double steam, long timeStamp){
         super(TYPE, GreenHouse.generateKey(greenHouseId));

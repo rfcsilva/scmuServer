@@ -1,12 +1,10 @@
 package pt.agroSmart.util;
 
+import com.google.appengine.api.datastore.GeoPt;
+import org.apache.commons.validator.routines.EmailValidator;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-
-import com.google.appengine.api.datastore.GeoPt;
-import com.google.appengine.repackaged.com.google.type.LatLng;
-import org.apache.commons.validator.routines.EmailValidator;
 
 public class InformationChecker {
 
@@ -50,9 +48,13 @@ public class InformationChecker {
 
     }
 
-    public static boolean validPosition(GeoPt coordinates){
-        return !(coordinates.getLatitude() > 90) && !(coordinates.getLatitude() < -90) && !(coordinates.getLongitude() > 180) && !(coordinates.getLongitude() < -180);
+    public static boolean validPosition(GeoPt[] points){
 
+        for(GeoPt point: points)
+            if(point.getLatitude() > 90 || (point.getLatitude() < -90) || (point.getLongitude() > 180) || (point.getLongitude() < -180))
+                return false;
+
+        return true;
     }
 
     private static boolean nonEmptyField(String field) {

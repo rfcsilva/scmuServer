@@ -1,6 +1,7 @@
 package pt.agroSmart.resources;
 
 import com.google.appengine.api.datastore.*;
+import jdk.nashorn.internal.objects.annotations.Getter;
 import pt.agroSmart.resources.GreenHouse.GreenHouse;
 import pt.agroSmart.util.InformationChecker;
 import pt.agroSmart.util.Strings;
@@ -34,10 +35,10 @@ public class GreenHouseResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createGreenHouse(GreenHouse gh){
 
-        String id = GreenHouse.generateStringId(gh.coordinates);
+        String id = GreenHouse.generateStringId(gh.center_coordinates);
         LOG.info(ATTEMPT_TO_CREATE_GREENHOUSE + id);
 
-        if( !InformationChecker.validPosition(gh.coordinates) ) {
+        if( !InformationChecker.validPosition(new GeoPt[]{gh.center_coordinates, gh.bottomLeft, gh.topLeft, gh.bottomRight, gh.topRight} )) {
 
             LOG.warning(INVALID_COORDINATES);
             return Response.status(Status.BAD_REQUEST).entity(Strings.FAILED_REQUIERED_PARAMS).build();
@@ -55,7 +56,7 @@ public class GreenHouseResource {
 
         } catch (EntityNotFoundException e) {
 
-            greenHouse = new GreenHouse(id, gh.name, gh.coordinates, gh.creatorUserName );
+            greenHouse = new GreenHouse(id, gh.name, gh.center_coordinates, gh.topLeft, gh.bottomLeft, gh.topRight, gh.bottomRight, gh.creatorUserName );
 
             if (greenHouse.ds_save(txn)) {
                 LOG.fine(GREEN_HOUSE_CREATED);
@@ -73,6 +74,8 @@ public class GreenHouseResource {
         }
 
     }
+
+
 
 
 

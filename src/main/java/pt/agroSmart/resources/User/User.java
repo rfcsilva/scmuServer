@@ -15,7 +15,7 @@ public class User extends StorableObject {
     private static final String COMPANY = "company";
 
 
-    private static final String TYPE = "User";
+    public static final String TYPE = "User";
 
     public String username;
     public String password;
