@@ -4,12 +4,8 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.GeoPt;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.repackaged.com.google.type.LatLng;
 import pt.agroSmart.StorableObject;
-import pt.agroSmart.resources.Sensor.Sensor;
-import pt.agroSmart.resources.User.User;
 
-import java.util.UUID;
 
 public class GreenHouse extends StorableObject {
 
@@ -19,63 +15,81 @@ public class GreenHouse extends StorableObject {
     private static final String NAME = "name";
     private static final String LATLNG = "Coordinates";
     private static final String CREATOR_USERNAME = "creator username";
+    private static final String BOTTOM_LEFT = "Bottom Left";
+    private static final String TOP_LEFT = "Top Left";
+    private static final String TOP_RIGHT = "Top Right";
+    private static final String BOTTOM_RIGHT = "Bottom Right";
 
-    public String id;
+    private String id;
     public String name;
-    public GeoPt coordinates;
+    public GeoPt center_coordinates;
     public String creatorUserName;
-    public Sensor[] sensors;
+    public GeoPt topLeft;
+    public GeoPt bottomLeft;
+    public GeoPt topRight;
+    public GeoPt bottomRight;
 
-    public GreenHouse() { super(); }
+    public GreenHouse() { }
 
     public GreenHouse(String id, String creatorUserName){
 
-        super(TYPE, generateKey(id, creatorUserName));
+        super(TYPE, generateKey(id));
         this.id = id;
         this.creatorUserName = creatorUserName;
     }
 
-    public GreenHouse(String id, String name, GeoPt coordinates, String creatorUserName){
-        super(TYPE, generateKey(id,creatorUserName));
+    public GreenHouse(String id, String name, GeoPt center_coordinates, GeoPt topLeft, GeoPt bottomLeft, GeoPt topRight, GeoPt bottomRight,String creatorUserName){
+        super(TYPE, generateKey(id));
         this.id = id;
         this.name = name;
-        this.coordinates = coordinates;
+        this.center_coordinates = center_coordinates;
+        this.topLeft = topLeft;
+        this.bottomLeft = bottomLeft;
+        this.topRight = topRight;
+        this.bottomRight = bottomRight;
         this.creatorUserName = creatorUserName;
-    }
-
-    private GreenHouse(String id, String name, GeoPt coordinates, String creatorUserName, Sensor[] sensors){
-        super(TYPE, generateKey(id,creatorUserName));
-        this.id = id;
-        this.name = name;
-        this.coordinates = coordinates;
-        this.creatorUserName = creatorUserName;
-        this.sensors = sensors;
     }
 
     public static String generateStringId(GeoPt coordinates){
+
         return TYPE.concat("@").concat(coordinates.toString());
     }
 
-    public static Key generateKey(String id, String creatorUserName){
+    public static Key generateKey(String id){
 
-        return KeyFactory.createKey(User.generateKey(creatorUserName), TYPE, id);
+        return KeyFactory.createKey(TYPE, id);
     }
 
 
     @Override
     protected Entity encodeEntity() {
 
-        Entity entity = new Entity(TYPE, id, User.generateKey(creatorUserName));
+        Entity entity = new Entity(TYPE, id);
         entity.setProperty(ID, id);
         entity.setUnindexedProperty(NAME, name);
-        entity.setIndexedProperty(LATLNG, coordinates);
+        entity.setIndexedProperty(LATLNG, center_coordinates);
+        entity.setIndexedProperty(BOTTOM_LEFT, bottomLeft);
+        entity.setIndexedProperty(TOP_LEFT, topLeft);
+        entity.setIndexedProperty(BOTTOM_RIGHT, bottomRight);
+        entity.setIndexedProperty(TOP_RIGHT, topRight);
         entity.setIndexedProperty(CREATOR_USERNAME, creatorUserName);
 
         return entity;
     }
 
     public static GreenHouse fromEntity(Entity e){
-        return null;
-    }
+
+        return new GreenHouse(
+                (String) e.getProperty(ID),
+                (String) e.getProperty(NAME),
+                (GeoPt) e.getProperty(LATLNG),
+                (GeoPt) e.getProperty(TOP_LEFT),
+                (GeoPt) e.getProperty(BOTTOM_LEFT),
+                (GeoPt) e.getProperty(TOP_RIGHT),
+                (GeoPt) e.getProperty(BOTTOM_RIGHT),
+                (String) e.getProperty(CREATOR_USERNAME)
+        );
+
+   }
 
 }

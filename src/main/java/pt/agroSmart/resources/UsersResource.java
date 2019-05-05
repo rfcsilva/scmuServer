@@ -204,6 +204,9 @@ public class UsersResource {
 
 	}
 
+	//TODO: Delete all greenhouses and sensors
+	//public Response deleteUser()
+
 	@GET
 	@Path("/{user}")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
