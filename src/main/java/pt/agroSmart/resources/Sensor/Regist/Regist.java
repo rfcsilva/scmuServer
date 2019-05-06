@@ -6,7 +6,7 @@ import pt.agroSmart.resources.GreenHouse.GreenHouse;
 
 public class Regist extends StorableObject {
 
-    private static final String TYPE = "regist";
+    public static final String TYPE = "regist";
 
     private static final String AIR_HUMIDITY = "Air humidity";
     private static final String GRENN_HOUSE = "grennHouse";
@@ -15,7 +15,7 @@ public class Regist extends StorableObject {
     private static final String WATER_LEVEL = "Water Level";
     private static final String LUMINOSITY = "Luminosity";
     private static final String STEAM = "Steam";
-    private static final String TIME_STAMP = "TimeStamp";
+    public static final String TIMESTAMP = "TimeStamp";
 
     public String greenHouseId;
     public float temperature;
@@ -51,7 +51,7 @@ public class Regist extends StorableObject {
         entity.setUnindexedProperty(WATER_LEVEL, waterLevel);
         entity.setUnindexedProperty(LUMINOSITY, luminosity);
         entity.setUnindexedProperty(STEAM, steam);
-        entity.setIndexedProperty(TIME_STAMP, timeStamp);
+        entity.setIndexedProperty(TIMESTAMP, timeStamp);
 
         return entity;
     }
@@ -66,7 +66,7 @@ public class Regist extends StorableObject {
                 (float) e.getProperty(WATER_LEVEL),
                 (double) e.getProperty(LUMINOSITY),
                 (double) e.getProperty(STEAM),
-                (long) e.getProperty(TIME_STAMP)
+                (long) e.getProperty(TIMESTAMP)
         );
 
     }

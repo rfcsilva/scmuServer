@@ -50,6 +50,10 @@ public class GreenHouse extends StorableObject {
         this.creatorUserName = creatorUserName;
     }
 
+    public GreenHouse(String greenHouseId) {
+        super(TYPE, generateKey(greenHouseId));
+    }
+
     public static String generateStringId(GeoPt coordinates){
 
         return TYPE.concat("@").concat(coordinates.toString());
