@@ -29,14 +29,8 @@ public class GreenHouse extends StorableObject {
     public GeoPt topRight;
     public GeoPt bottomRight;
 
+
     public GreenHouse() { }
-
-    public GreenHouse(String id, String creatorUserName){
-
-        super(TYPE, generateKey(id));
-        this.id = id;
-        this.creatorUserName = creatorUserName;
-    }
 
     public GreenHouse(String id, String name, GeoPt center_coordinates, GeoPt topLeft, GeoPt bottomLeft, GeoPt topRight, GeoPt bottomRight,String creatorUserName){
         super(TYPE, generateKey(id));

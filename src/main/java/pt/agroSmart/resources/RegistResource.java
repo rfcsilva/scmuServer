@@ -1,4 +1,4 @@
-package pt.agroSmart.resources.User;
+package pt.agroSmart.resources;
 
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.datastore.Query.Filter;
@@ -47,11 +47,12 @@ public class RegistResource {
     }
 
     @GET
-    @Path("/{greenhouse}")
+    @Path("/{greenhouse}/{sensor}/")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response greenHouseReadings(@PathParam("greenhouse") String ghId, @QueryParam("t1") long init, @QueryParam("t2") long end){
+    public Response greenHouseReadings(@PathParam("greenhouse") String ghId, @PathParam("sensor") String sensorId, @QueryParam("t1") long init, @QueryParam("t2") long end){
 
         Key greenHouseKey = GreenHouse.generateKey(ghId);
+
 
         Filter f1 = new FilterPredicate(Regist.TIMESTAMP, FilterOperator.GREATER_THAN_OR_EQUAL, init);
         Filter f2 = new FilterPredicate(Regist.TIMESTAMP, FilterOperator.LESS_THAN_OR_EQUAL, end);

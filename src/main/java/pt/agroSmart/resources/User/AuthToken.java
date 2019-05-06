@@ -3,11 +3,13 @@ package pt.agroSmart.resources.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import pt.agroSmart.StorableObject;
 
+import javax.ws.rs.core.HttpHeaders;
 import java.util.Date;
 
 
@@ -69,5 +71,19 @@ public class AuthToken extends StorableObject {
         return token;
 
 	}
+
+    public static DecodedJWT getDecodedToken(String encodedToken ) {
+
+	    DecodedJWT jwt = JWT.decode(encodedToken);
+        return jwt;
+    }
+
+    public static String getTokenFromHeaders(HttpHeaders headers){
+
+        // Get the HTTP Authorization header from the request
+        String authorizationHeader = headers.getHeaderString(HttpHeaders.AUTHORIZATION);
+        // Extract the token from the HTTP Authorization header and docoding it
+        return authorizationHeader.substring("Bearer".length()).trim();
+    }
 
 }
