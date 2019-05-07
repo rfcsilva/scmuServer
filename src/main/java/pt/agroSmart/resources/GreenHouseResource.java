@@ -1,6 +1,9 @@
 package pt.agroSmart.resources;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.*;
 import com.google.gson.Gson;
 import pt.agroSmart.resources.GreenHouse.GreenHouse;
@@ -14,6 +17,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -103,15 +108,22 @@ public class GreenHouseResource {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listGreenHouses(HttpHeaders headers){
+    public Response listGreenHouses(HttpHeaders headers) {
 
         DecodedJWT token = AuthToken.getDecodedToken(AuthToken.getTokenFromHeaders(headers));
         String userName = token.getClaim(User.TYPE).asString();
 
-        List<>
+        Filter f1 = new FilterPredicate(GreenHouse.CREATOR_USERNAME, FilterOperator.EQUAL, userName);
+        Query query = new Query(GreenHouse.TYPE);
+        query.setFilter(f1);
+
+        List<Entity> ghEntities = datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
+        List<GreenHouse> greenHouses = new ArrayList<>(ghEntities.size());
+
+        for (Entity e : ghEntities)
+            greenHouses.add(GreenHouse.fromEntity(e));
+
+        return Response.ok(gson.toJson(greenHouses)).build();
 
     }
-
-
-
 }

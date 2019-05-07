@@ -9,12 +9,12 @@ import pt.agroSmart.StorableObject;
 
 public class GreenHouse extends StorableObject {
 
-    private static final String TYPE = "GreenHouse" ;
+    public static final String TYPE = "GreenHouse" ;
 
     private static final String ID = "id";
     private static final String NAME = "name";
     private static final String LATLNG = "Coordinates";
-    private static final String CREATOR_USERNAME = "creator username";
+    public static final String CREATOR_USERNAME = "creator username";
     private static final String BOTTOM_LEFT = "Bottom Left";
     private static final String TOP_LEFT = "Top Left";
     private static final String TOP_RIGHT = "Top Right";
