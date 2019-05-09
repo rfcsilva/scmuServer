@@ -28,7 +28,7 @@ public class GreenHouse extends StorableObject {
     public GeoPt bottomLeft;
     public GeoPt topRight;
     public GeoPt bottomRight;
-
+    public Config config;
 
     public GreenHouse() { }
 

@@ -28,7 +28,6 @@ public class Sensor extends StorableObject {
     }
 
 
-
     @Override
     protected Entity encodeEntity() {
         return null;

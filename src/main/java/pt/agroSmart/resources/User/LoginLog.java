@@ -3,7 +3,6 @@ package pt.agroSmart.resources.User;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import org.bouncycastle.crypto.prng.EntropyUtil;
 import pt.agroSmart.StorableObject;
 
 public class LoginLog extends StorableObject {
@@ -28,6 +27,8 @@ public class LoginLog extends StorableObject {
     private String loginCountry;
     private long loginDate;
 
+    public LoginLog() { }
+    
     public LoginLog(String userIp, String userHost, String userLatLon, String loginCity, String loginCountry, long loginDate){
         super(TYPE, generateKey(loginDate));
         this.userIp = userIp;
@@ -37,8 +38,7 @@ public class LoginLog extends StorableObject {
         this.loginCountry = loginCountry;
         this.loginDate = loginDate;
     }
-
-
+    
     private static Key generateKey(long loginDate) {
 
         return KeyFactory.createKey(TYPE, loginDate);
