@@ -22,22 +22,19 @@ public class User extends StorableObject {
     public String confirmation_password;
     public String name;
     public String email;
-    public String phoneNumber;
     public String role;
-    public String company;
 
     public User(){ super(); }
 
-    public User(String username, String password, String confirmation_password, String name, String email, String phoneNumber, String role, String company){
+    public User(String username, String password, String confirmation_password, String name, String email, String role){
         super(TYPE, generateKey(username)) ;
         this.username = username;
         this.password = password;
         this.confirmation_password = confirmation_password;
         this.name = name;
         this.email = email;
-        this.phoneNumber = phoneNumber;
         this.role = role;
-        this.company = company;
+
     }
 
     public User(String username){
@@ -45,15 +42,11 @@ public class User extends StorableObject {
         this.username = username;
     }
 
-    protected User(String username, String password, String name, String email, String phoneNumber, String role, String company){
-        super(TYPE, generateKey(username));
+    protected User(String username, String name, String email, String role){
         this.username = username;
-        this.password = password;
         this.name = name;
         this.email = email;
-        this.phoneNumber = phoneNumber;
         this.role = role;
-        this.company = company;
     }
 
     public String getPassword(){ return  password; }
@@ -66,9 +59,7 @@ public class User extends StorableObject {
         userEntity.setUnindexedProperty(PASSWORD, password);
         userEntity.setUnindexedProperty(NAME, name);
         userEntity.setUnindexedProperty(EMAIL, email);
-        userEntity.setUnindexedProperty(PHONE_NUMBER, phoneNumber);
         userEntity.setProperty(ROLE, role);
-        userEntity.setProperty(COMPANY, company);
 
         return userEntity;
 
@@ -79,12 +70,9 @@ public class User extends StorableObject {
 
         return new User(
                 (String) e.getProperty(USERNAME),
-                (String) e.getProperty(PASSWORD),
                 (String) e.getProperty(NAME),
                 (String) e.getProperty(EMAIL),
-                (String) e.getProperty(PHONE_NUMBER),
-                (String) e.getProperty(ROLE),
-                (String) e.getProperty(COMPANY)
+                (String) e.getProperty(ROLE)
         );
 
     }
@@ -101,10 +89,5 @@ public class User extends StorableObject {
         if(data.email!= null)
             email = data.email;
 
-        if(data.phoneNumber != null)
-            phoneNumber = data.phoneNumber;
-
-        if(data.company != null)
-            company = data.company;
     }
 }
