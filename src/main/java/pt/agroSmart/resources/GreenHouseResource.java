@@ -64,7 +64,7 @@ public class GreenHouseResource {
 
         } catch (EntityNotFoundException e) {
 
-            greenHouse = new GreenHouse(id, gh.name, gh.center_coordinates, gh.topLeft, gh.bottomLeft, gh.topRight, gh.bottomRight, gh.creatorUserName );
+            greenHouse = new GreenHouse(id, gh.creatorUserName, gh.name, gh.center_coordinates, gh.topLeft, gh.bottomLeft, gh.topRight, gh.bottomRight);
 
             if (greenHouse.ds_save(txn)) {
                 LOG.fine(GREEN_HOUSE_CREATED);

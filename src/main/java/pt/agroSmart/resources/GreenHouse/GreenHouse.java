@@ -1,9 +1,6 @@
 package pt.agroSmart.resources.GreenHouse;
 
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.GeoPt;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.*;
 import pt.agroSmart.StorableObject;
 
 
@@ -28,11 +25,10 @@ public class GreenHouse extends StorableObject {
     public GeoPt bottomLeft;
     public GeoPt topRight;
     public GeoPt bottomRight;
-    public Config config;
 
     public GreenHouse() { }
 
-    public GreenHouse(String id, String name, GeoPt center_coordinates, GeoPt topLeft, GeoPt bottomLeft, GeoPt topRight, GeoPt bottomRight,String creatorUserName){
+    public GreenHouse(String id, String creatorUserName, String name, GeoPt center_coordinates, GeoPt topLeft, GeoPt bottomLeft, GeoPt topRight, GeoPt bottomRight){
         super(TYPE, generateKey(id));
         this.id = id;
         this.name = name;
@@ -71,7 +67,6 @@ public class GreenHouse extends StorableObject {
         entity.setIndexedProperty(BOTTOM_RIGHT, bottomRight);
         entity.setIndexedProperty(TOP_RIGHT, topRight);
         entity.setIndexedProperty(CREATOR_USERNAME, creatorUserName);
-
         return entity;
     }
 
@@ -79,13 +74,13 @@ public class GreenHouse extends StorableObject {
 
         return new GreenHouse(
                 (String) e.getProperty(ID),
+                (String) e.getProperty(CREATOR_USERNAME),
                 (String) e.getProperty(NAME),
                 (GeoPt) e.getProperty(LATLNG),
                 (GeoPt) e.getProperty(TOP_LEFT),
                 (GeoPt) e.getProperty(BOTTOM_LEFT),
                 (GeoPt) e.getProperty(TOP_RIGHT),
-                (GeoPt) e.getProperty(BOTTOM_RIGHT),
-                (String) e.getProperty(CREATOR_USERNAME)
+                (GeoPt) e.getProperty(BOTTOM_RIGHT)
         );
 
    }
