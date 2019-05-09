@@ -3,36 +3,22 @@ package pt.agroSmart.util;
 import com.google.appengine.api.datastore.GeoPt;
 import org.apache.commons.validator.routines.EmailValidator;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class InformationChecker {
 
 
-    private static final int PHONE_NUMBER_SIZE = 9;
     private static final int PASSWORD_MIN_LENGTH = 6;
 
     public static boolean validRegistration(String username, String password, String confirmation_password,
-                                            String email, String phoneNumber, String role){
+                                            String email, String role){
 
         return nonEmptyField(username) && nonEmptyField(password) && nonEmptyField(confirmation_password) &&
-                nonEmptyField(email) && validEmail(email) && validPhoneNumber(phoneNumber) && validPassword( password,  confirmation_password)
+                nonEmptyField(email) && validEmail(email) && validPassword( password,  confirmation_password)
                 && nonEmptyField(role);
     }
 
     private static boolean validEmail(String email) {
 
         return  EmailValidator.getInstance().isValid(email);
-
-    }
-
-    private static boolean validPhoneNumber(String phoneNumber) {
-
-        if(phoneNumber.length() != PHONE_NUMBER_SIZE) return false;
-
-        Pattern pattern = Pattern.compile("^[0-9]+$");
-        Matcher matcher = pattern.matcher(phoneNumber);
-        return matcher.find();
 
     }
 

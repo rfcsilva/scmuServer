@@ -10,7 +10,6 @@ import pt.agroSmart.util.InformationChecker;
 import pt.agroSmart.util.PasswordEncriptor;
 import pt.agroSmart.util.Strings;
 
-import javax.annotation.Generated;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -52,7 +51,7 @@ public class UsersResource {
 	private static final String SENDING_DATA = "Sending request response.";
 	private static final String REQUEST_TO_UPDATE_USER_INFO = "Request to update user info.";
 	private static final String USER_INFO_UPDATED = "User Info Updated";
-	public static final String LISTING_USERS = "Listing Users";
+	private static final String LISTING_USERS = "Listing Users";
 
 	public UsersResource() { } //Nothing to be done here...
 
@@ -70,7 +69,7 @@ public class UsersResource {
 
 		LOG.info(ATTEMPT_TO_REGISTER_USER + data.username);
 
-		if( !InformationChecker.validRegistration(data.username, data.password, data.confirmation_password,  data.email, data.phoneNumber, data.role) ) {
+		if( !InformationChecker.validRegistration(data.username, data.password, data.confirmation_password,  data.email, data.role) ) {
 
 			LOG.warning(INVALID_PARAMS);
 			return Response.status(Status.BAD_REQUEST).entity(Strings.FAILED_REQUIERED_PARAMS).build();
@@ -88,7 +87,7 @@ public class UsersResource {
 
 		} catch (EntityNotFoundException e) {
 
-			user = new User(data.username, PasswordEncriptor.get_sha256_HMAC_SecurePassword(data.password), PasswordEncriptor.get_sha256_HMAC_SecurePassword(data.confirmation_password), data.name, data.email, data.phoneNumber, data.role, data.company );
+			user = new User(data.username, PasswordEncriptor.get_sha256_HMAC_SecurePassword(data.password), PasswordEncriptor.get_sha256_HMAC_SecurePassword(data.confirmation_password), data.name, data.email, data.role);
 
 			if (user.ds_save(txn)) {
 				LOG.fine(USER_RESISTED);
@@ -167,7 +166,7 @@ public class UsersResource {
 					token = (String) token_entity.getProperty(Strings.TOKEN);
 					AuthToken.verifier.verify(token);
 
-				}catch(JWTVerificationException e  ) {
+				}catch(JWTVerificationException | NullPointerException e  ) { //nullpointer comes when the asSigle entitiy comes as null.
 
 					//Creating the token
                     AuthToken authToken = new AuthToken(UUID.randomUUID().toString(), data.username, userEntity.getKey());
