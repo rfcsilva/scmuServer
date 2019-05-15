@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-@Path("/config")
+@Path("/withtoken/config")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ConfigResource {
 

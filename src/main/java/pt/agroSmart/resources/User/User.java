@@ -6,14 +6,11 @@ import pt.agroSmart.StorableObject;
 
 public class User extends StorableObject {
 
-    static final String USERNAME = "username";
+    public static final String USERNAME = "username";
     private static final String PASSWORD = "password";
     private static final String NAME = "name";
     private static final String EMAIL = "email";
-    private static final String PHONE_NUMBER = "phone number";
     private static final String ROLE = "role";
-    private static final String COMPANY = "company";
-
 
     public static final String TYPE = "User";
 
@@ -48,7 +45,7 @@ public class User extends StorableObject {
         this.email = email;
         this.role = role;
     }
-
+    
     public String getPassword(){ return  password; }
 
     @Override
@@ -65,7 +62,7 @@ public class User extends StorableObject {
 
     }
 
-
+   
     public static User fromEntity(Entity e) {
 
         return new User(
@@ -73,10 +70,16 @@ public class User extends StorableObject {
                 (String) e.getProperty(NAME),
                 (String) e.getProperty(EMAIL),
                 (String) e.getProperty(ROLE)
-        );
+                
+        	);
 
     }
 
+    
+    public static String getPassword(Entity e) {
+    	return (String) e.getProperty(PASSWORD);
+    }
+    
     public static Key generateKey(String userName) {
         return KeyFactory.createKey(TYPE, userName);
     }

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 
-@Path("/greenhouse")
+@Path("/withtoken/greenhouse")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class GreenHouseResource {
 

@@ -33,7 +33,6 @@ public class TokenFilter implements Filter {
     static final long ONE_MINUTE_IN_MILLIS=60000;//millisecs
 
     private static final Logger LOG = Logger.getLogger(TokenFilter.class.getName());
-    private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     public TokenFilter() {}
 
@@ -56,6 +55,8 @@ public class TokenFilter implements Filter {
         boolean ok = true;
         DecodedJWT jwt = null;
 
+        System.out.println("EHEHEH tou no filtro");
+        
         /// Get the HTTP Authorization header from the request
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String authorizationHeader =   httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
@@ -84,7 +85,7 @@ public class TokenFilter implements Filter {
 
             //Just to check that the stringToken is registed if not exception will be thrown
             String token_id = jwt.getId();
-            String token_username = jwt.getClaim(User.TYPE).asString();
+            String token_username = jwt.getClaim(User.USERNAME).asString();
             User user = new User(token_username);
             AuthToken token = new AuthToken(token_id, token_username, User.generateKey(token_username));
 
@@ -101,9 +102,11 @@ public class TokenFilter implements Filter {
         }
 
         if(ok) {
+        	System.out.println("eita");
             chain.doFilter(request, response);
         }else {
-            HttpServletResponse res = (HttpServletResponse) response;
+        	System.out.println("Ah doido");
+        	HttpServletResponse res = (HttpServletResponse) response;
             res.setStatus(401);
             res.sendRedirect("error/401/401.html");
         }

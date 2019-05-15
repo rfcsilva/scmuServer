@@ -1,0 +1,78 @@
+html{
+    height:100%;
+}
+body{
+    background-image: url("https://storage.googleapis.com/novaleaf-198916.appspot.com/forestt.jpg");
+    height: 80%;
+
+}
+
+
+h1{
+    font-family: "Times New Roman";
+    font-size: 40px;
+
+}
+
+h1.high{
+    font-family: "Times New Roman";
+    font-size: 10vw;
+    margin-bottom: -10px;
+
+}
+
+
+p{
+    font-family: "Times New Roman";
+    margin-left: 20px;
+
+}
+
+p.b{
+    color:bisque;
+    font-family: "Times New Roman";
+}
+
+p.c{
+    margin-top: -20px;
+}
+
+div.hades{
+    font-size: 2vw;
+    text-align: center;
+}
+
+a.zeus{
+    color:#00c1c5;
+
+}
+
+div.persephone{
+    background-color: bisque;
+    opacity: 0.7;
+    text-align: center;
+
+
+}
+
+section.helios{
+    background-color: bisque;
+    opacity: 0.7;
+    background-clip: padding-box;
+    padding: 1px;
+    margin-left: 30%;
+    margin-right: 30%;
+    margin-top: 60px;
+
+}
+
+
+
+.footer{
+    background-color: #361b00;
+    margin-bottom: 0%;
+    margin-top: 37vh;
+    display: block;
+    font-family: "Times New Roman";
+}
+
