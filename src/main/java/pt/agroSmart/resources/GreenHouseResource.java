@@ -13,6 +13,7 @@ import pt.agroSmart.util.InformationChecker;
 import pt.agroSmart.util.Strings;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -85,10 +86,11 @@ public class GreenHouseResource {
     @GET
     @Path("/{greenhouse}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getInfo(HttpHeaders headers, @PathParam("greenhouse") String greenHouse){
+    public Response getInfo(@Context HttpHeaders headers, @PathParam("greenhouse") String greenHouse){
 
+    	System.out.println(headers == null);
         DecodedJWT token = AuthToken.getDecodedToken(AuthToken.getTokenFromHeaders(headers));
-        String userName = token.getClaim(User.TYPE).asString();
+        String userName = token.getClaim(User.USERNAME).asString();
 
         try {
             User user = new User(userName);
@@ -102,17 +104,19 @@ public class GreenHouseResource {
 
         } catch (EntityNotFoundException e) {
             return Response.status(Status.NOT_FOUND).build();
-        }
+        }	
     }
 
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listGreenHouses(HttpHeaders headers) {
+    public Response listGreenHouses(@Context HttpHeaders headers) {
 
         DecodedJWT token = AuthToken.getDecodedToken(AuthToken.getTokenFromHeaders(headers));
-        String userName = token.getClaim(User.TYPE).asString();
-
+        String userName = token.getClaim(User.USERNAME).asString();
+        
+        System.out.println(userName);
+        
         Filter f1 = new FilterPredicate(GreenHouse.CREATOR_USERNAME, FilterOperator.EQUAL, userName);
         Query query = new Query(GreenHouse.TYPE);
         query.setFilter(f1);

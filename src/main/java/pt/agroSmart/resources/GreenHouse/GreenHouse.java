@@ -29,7 +29,7 @@ public class GreenHouse extends StorableObject {
     public GreenHouse() { }
 
     public GreenHouse(String id, String creatorUserName, String name, GeoPt center_coordinates, GeoPt topLeft, GeoPt bottomLeft, GeoPt topRight, GeoPt bottomRight){
-        super(TYPE, generateKey(id));
+        
         this.id = id;
         this.name = name;
         this.center_coordinates = center_coordinates;
@@ -39,6 +39,7 @@ public class GreenHouse extends StorableObject {
         this.bottomRight = bottomRight;
         this.creatorUserName = creatorUserName;
     }
+   
 
     public GreenHouse(String greenHouseId) {
         super(TYPE, generateKey(greenHouseId));
