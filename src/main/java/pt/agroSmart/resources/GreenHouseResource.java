@@ -10,6 +10,7 @@ import pt.agroSmart.resources.GreenHouse.GreenHouse;
 import pt.agroSmart.resources.User.AuthToken;
 import pt.agroSmart.resources.User.User;
 import pt.agroSmart.util.InformationChecker;
+import pt.agroSmart.util.ListWithCursor;
 import pt.agroSmart.util.Strings;
 
 import javax.ws.rs.*;
@@ -127,7 +128,7 @@ public class GreenHouseResource {
         for (Entity e : ghEntities)
             greenHouses.add(GreenHouse.fromEntity(e));
 
-        return Response.ok(gson.toJson(greenHouses)).build();
+        return Response.ok(gson.toJson(new ListWithCursor(true, null, greenHouses))).build();
 
     }
 }

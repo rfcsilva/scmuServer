@@ -3,8 +3,14 @@ package pt.agroSmart;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.google.appengine.api.datastore.*;
-import pt.agroSmart.resources.User.User;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Transaction;
 
 public abstract class StorableObject {
 

@@ -1,20 +1,24 @@
 package pt.agroSmart.filters;
 
-import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.auth0.jwt.interfaces.Header;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import pt.agroSmart.resources.User.AuthToken;
-import pt.agroSmart.resources.User.User;
+import java.io.IOException;
+import java.util.logging.Logger;
 
-import javax.servlet.*;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
-import java.util.logging.Logger;
+
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+
+import pt.agroSmart.resources.User.AuthToken;
+import pt.agroSmart.resources.User.User;
 
 
 /**
@@ -83,10 +87,9 @@ public class TokenFilter implements Filter {
                 ok = false;
             }
 
-            //Just to check that the stringToken is registed if not exception will be thrown
+            //Just to check that the stringToken is registered if not exception will be thrown
             String token_id = jwt.getId();
             String token_username = jwt.getClaim(User.USERNAME).asString();
-            User user = new User(token_username);
             AuthToken token = new AuthToken(token_id, token_username, User.generateKey(token_username));
 
             try {

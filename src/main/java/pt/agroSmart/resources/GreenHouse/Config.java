@@ -3,10 +3,8 @@ package pt.agroSmart.resources.GreenHouse;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import pt.agroSmart.StorableObject;
 
-import javax.crypto.KeyGenerator;
-import java.util.UUID;
+import pt.agroSmart.StorableObject;
 
 public class Config extends StorableObject {
 
@@ -23,7 +21,7 @@ public class Config extends StorableObject {
     private static final String STEAM_DEVIATION = "Steam Deviation";
     private static final String AVERAGE_LUMINOSITY = "AVERAGE LUMINOSITY";
     private static final String LUMINOSITY_DEVIATION = "LUMINOSITY DEVIATION";
-    private static final String ID = "id";
+    public static final String ID = "id";
 
     private String id;
     private String greenHouseId;

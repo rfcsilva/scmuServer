@@ -16,8 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.gson.Gson;
@@ -40,7 +38,6 @@ public class UsersResource {
 	 * A logger object.
 	 */
 	private static final Logger LOG = Logger.getLogger(UsersResource.class.getName());
-	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private static final Gson gson = new Gson();
 
 	private static final String RETRIEVING_USER_INFO = "Retrieving user info.";
